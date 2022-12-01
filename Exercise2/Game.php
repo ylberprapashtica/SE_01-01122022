@@ -70,17 +70,17 @@ class Game
 
     private function gameLoop(){
         $this->displayBoard();
-        $this->displayPossibleMoves();
         if($this->board->areTilesInOrder()){
             print("You won");
         }else{
+            $this->displayPossibleMoves();
             $this->board->moveTile($this->readNextmove());
             $this->gameLoop();
         }
     }
 
     private function displayPossibleMoves(){
-        foreach($this->board->possibleMoves() as $moveDirection => $tilePosition){
+        foreach($this->board->getPossibleMoves() as $moveDirection => $tilePosition){
             print("Move tile [" . $this->board->getTile($tilePosition)."] $moveDirection.\n");
         }
     }

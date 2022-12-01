@@ -4,6 +4,7 @@ class Board
 {
     private int $gridSize;
     private array $boardTiles;
+    private array $possibleMoves;
 
     /**
      * @throws Exception
@@ -14,6 +15,7 @@ class Board
         if(floor($gridSize) == $gridSize && array_unique($boardTiles) == $boardTiles){
             $this->gridSize = $gridSize;
             $this->boardTiles = $boardTiles;
+            $this->setPossibleMoves();
         }else{
             throw new Exception("Board is not set right!");
         }
@@ -35,7 +37,7 @@ class Board
         }
     }
 
-    public function possibleMoves(): array
+    public function setPossibleMoves(): void
     {
         $emptyPosition = array_search(null, $this->boardTiles);
 
@@ -46,11 +48,15 @@ class Board
             'right' => $emptyPosition - 1,
         ];
 
-        return array_filter($possibleMoves, function($position) use ($emptyPosition){
+        $this->possibleMoves = array_filter($possibleMoves, function($position) use ($emptyPosition){
             return $this->positionExists($position)
                 && ($this->areInSameRow($position, $emptyPosition)
                     || $this->areInSameColumn($position, $emptyPosition));
         });
+    }
+
+    public function getPossibleMoves(){
+        return $this->possibleMoves;
     }
 
     public function tilesThatCanMove()
@@ -121,6 +127,7 @@ class Board
 
             $this->boardTiles[$emptyPosition] = $tile;
             $this->boardTiles[$tilePosition] = null;
+            $this->setPossibleMoves();
         }
     }
 
