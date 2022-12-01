@@ -62,7 +62,7 @@ class Board
     public function tilesThatCanMove()
     {
         $tilesThatCanMove = [];
-        foreach($this->possibleMoves() as $tilePosition){
+        foreach($this->getPossibleMoves() as $tilePosition){
             $tilesThatCanMove[] = $this->getTile($tilePosition);
         }
         return $tilesThatCanMove;

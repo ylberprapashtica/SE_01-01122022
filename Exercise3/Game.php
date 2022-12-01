@@ -6,17 +6,30 @@ class Game
 {
     private Board $board;
 
+    private int $moves = 0;
+
+    public function getMoves(): int
+    {
+        return $this->moves;
+    }
+
     /**
      * @throws Exception
      */
-    public function __construct()
+    public function __construct(array $board = null)
     {
-        $this->board = new Board($this->createBoard());
+        if($board){
+            $this->board = new Board($board);
+
+        }else{
+            $this->board = new Board($this::createBoard());
+
+        }
         print("Type the number of the tile you want to move!\n");
         $this->gameLoop();
     }
 
-    private function createBoard()
+    public static function createBoard()
     {
         print("Set grid size:");
         while(true) {
@@ -33,8 +46,8 @@ class Game
 
         $board = [];
         while(!empty($tempBoard)) {
-            print("Available tiles: " . $this->displayArray($tempBoard));
-            print("Board Tiles: " . $this->displayArray($board));
+            print("Available tiles: " . Game::displayArray($tempBoard));
+            print("Board Tiles: " . Game::displayArray($board));
             $input = readline('Move Tile: ');
             if(settype($input, 'int') && (in_array($input, $tempBoard))){
                 unset($tempBoard[array_search($input, $tempBoard)]);
@@ -45,7 +58,7 @@ class Game
         return $board;
     }
 
-    private function displayArray(array $array)
+    private static function displayArray(array $array)
     {
         $string = "";
         foreach ($array as $value){
@@ -53,6 +66,7 @@ class Game
         }
         return substr($string, 0, -1) . "\n";
     }
+
     private function displayBoard() : void
     {
         $board = $this->board->getBoardTiles();
@@ -71,10 +85,11 @@ class Game
     private function gameLoop(){
         $this->displayBoard();
         if($this->board->areTilesInOrder()){
-            print("You won");
+            print("You won \n");
         }else{
             $this->displayPossibleMoves();
             $this->board->moveTile($this->readNextmove());
+            $this->moves++;
             $this->gameLoop();
         }
     }
@@ -95,5 +110,3 @@ class Game
         }
     }
 }
-
-$game = new Game();
