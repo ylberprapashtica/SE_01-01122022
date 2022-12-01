@@ -2,12 +2,31 @@
 
 class Board
 {
+    private int $gridSize;
+    private array $boardTiles;
 
-    private array $boardTiles = [1, 8, 2, 4, 3, 5, 7, 6, NULL];
+    /**
+     * @throws Exception
+     */
+    public function __construct(array $boardTiles)
+    {
+        $gridSize= sqrt(count($boardTiles));
+        if(floor($gridSize) == $gridSize && array_unique($boardTiles) == $boardTiles){
+            $this->gridSize = $gridSize;
+            $this->boardTiles = $boardTiles;
+        }else{
+            throw new Exception("Board is not set right!");
+        }
+    }
 
     public function getBoardTiles(): array
     {
         return $this->boardTiles;
+    }
+
+    public function getGridSize()
+    {
+        return $this->gridSize;
     }
 
     public function getTile(int $position){
@@ -21,16 +40,16 @@ class Board
         $emptyPosition = array_search(null, $this->boardTiles);
 
         $possibleMoves = [
-            'down' => $emptyPosition - 3,
+            'down' => $emptyPosition - $this->getGridSize(),
             'left' => $emptyPosition + 1,
-            'up' => $emptyPosition + 3,
+            'up' => $emptyPosition + $this->getGridSize(),
             'right' => $emptyPosition - 1,
         ];
 
         return array_filter($possibleMoves, function($position) use ($emptyPosition){
             return $this->positionExists($position)
                 && ($this->areInSameRow($position, $emptyPosition)
-                || $this->areInSameColumn($position, $emptyPosition));
+                    || $this->areInSameColumn($position, $emptyPosition));
         });
     }
 
@@ -49,7 +68,7 @@ class Board
 
     private function positionExists(int $position): bool
     {
-        return $position >= 0 && $position < 9;
+        return $position >= 0 && $position < pow($this->getGridSize(), 2);
     }
 
     private function tileExists(int $position): bool
@@ -59,7 +78,15 @@ class Board
 
     private function areInSameRow(int $position1, int $position2): bool
     {
-        $rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
+        $rows = [];
+        for($i = 0; $i < $this->getGridSize(); $i++){
+            $rowI = [];
+            for($j = $i * $this->getGridSize(); $j < $i * $this->getGridSize() + $this->getGridSize(); $j++){
+                $rowI[] = $j;
+            }
+            $rows[] = $rowI;
+        }
+
         foreach ($rows as $row){
             if(in_array($position1, $row) && in_array($position2, $row)){
                 return true;
@@ -70,7 +97,15 @@ class Board
 
     private function areInSameColumn(int $position1, int $position2): bool
     {
-        $columns = [[0, 3, 6], [1, 4, 7], [2, 5, 8]];
+        $columns = [];
+        for($i = 0; $i < $this->getGridSize(); $i++){
+            $columnI = [];
+            for($j = 0; $j < $this->getGridSize(); $j++){
+                $columnI[] = $i + ($j *  $this->getGridSize());
+            }
+            $columns[] = $columnI;
+        }
+
         foreach ($columns as $column){
             if(in_array($position1, $column) && in_array($position2, $column)){
                 return true;
@@ -94,7 +129,7 @@ class Board
             if($position + 1 === $tile){
                 continue;
             }else{
-                if($tile === null && $position === 8){
+                if($tile === null && $position === pow($this->getGridSize(), 2) - 1){
                     return true;
                 }
                 return false;
